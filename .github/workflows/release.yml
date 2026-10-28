@@ -1,0 +1,39 @@
+# claude-plugin's release workflow (fab0 spec R4.26, agent interface section 11.4): a merge to main that changes
+# .claude-plugin/plugin.json's version is tagged v<version>, with a GitHub release. It isn't among the files fab0
+# copies here, and is written once, when the repository is set up.
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths: [".claude-plugin/plugin.json"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: tag and release a new version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE: ${{ github.sha }}
+        run: |
+          version=$(jq -er .version .claude-plugin/plugin.json)
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "plugin.json's version $version isn't x.y.z"; exit 1; fi
+          # A version is released once: a merge that leaves it unchanged, or brings back an older one, makes nothing.
+          if gh api "repos/$GH_REPO/git/ref/tags/v$version" >/dev/null 2>&1; then
+            echo "v$version is already tagged"
+            exit 0
+          fi
+          gh release create "v$version" --target "$SOURCE" --title "v$version" --generate-notes
