@@ -1,0 +1,10 @@
+{
+  "name": "fab0",
+  "version": "0.4.0",
+  "description": "Runs your fab0 pipelines from Claude Code: see runs and your queue, take steps and acts, and write .fab0/pipelines.yml.",
+  "author": { "name": "fab0" },
+  "homepage": "https://fab0.dev",
+  "repository": "https://github.com/fab0-dev/claude-plugin",
+  "license": "MIT",
+  "keywords": ["fab0", "pipelines", "orchestration"]
+}
