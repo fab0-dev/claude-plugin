@@ -4,7 +4,7 @@
 
 It installs:
 
-- **The fab0 MCP server**, at `https://mcp.fab0.dev/mcp`: tools to read runs and your queue, validate and sync pipelines, start, cancel and rebuild runs, and claim and complete work; and the prompt `/fab0:continue`.
+- **The fab0 MCP server**, at `https://mcp.fab0.dev/mcp`: tools to read runs and your queue, validate and sync pipelines, start, cancel and rebuild runs, and claim and complete work; and the prompt `/mcp__plugin_fab0_fab0__continue`.
 - **The `fab0-work` skill**, which takes a step or an act from your queue and does it as the pipeline asks.
 - **The `fab0-pipelines` skill**, which writes and changes your repository's `.fab0/pipelines.yml` with you, checks it with fab0, and opens a pull request for it.
 
@@ -25,11 +25,11 @@ The first fab0 tool call asks you to sign in. Run `/mcp`, choose the fab0 plugin
 
 In a checkout of a repository that runs fab0 pipelines:
 
-- `/fab0:continue` shows what waits on you there, and continues with the entry you pick.
+- `/mcp__plugin_fab0_fab0__continue` shows what waits on you there, and continues with the entry you pick.
 - Or ask in your own words: "what's waiting on me in fab0?", "show run 01K…", "take the next fab0 step".
 - To write a pipeline, describe how work should flow: "write a fab0 pipeline where a planner breaks each Feature into Stories, and a person reviews each Story's pull request". Or start from a recipe in [fab0-dev/home](https://github.com/fab0-dev/home): "set up the feature-delivery recipe".
 
-Steps and acts are done with your own `git` and GitHub CLI (`gh`), signed in as you. fab0 itself never writes to GitHub.
+Steps and acts are done with your own `git` and GitHub CLI (`gh`), signed in as you. fab0 itself never writes to GitHub. Claude Code's auto mode refuses an act's label change or merge as a write to an external system, so approve those `gh` commands when Claude Code asks, with auto mode off, or allow them for your repositories in `/permissions`.
 
 ## Update
 
