@@ -31,6 +31,10 @@ In a checkout of a repository that runs fab0 pipelines:
 
 Steps and acts are done with your own `git` and GitHub CLI (`gh`), signed in as you. fab0 itself never writes to GitHub. Claude Code's auto mode refuses an act's label change or merge as a write to an external system, so approve those `gh` commands when Claude Code asks, with auto mode off, or allow them for your repositories in `/permissions`.
 
+## Register a routine
+
+fab0 can also hand your steps and acts to a Claude Code routine of yours, which runs them in the cloud. Ask "register a fab0 routine for this repository" and follow the setup it gives: one routine per repository and model class, with that repository alone, fab0's saved prompt, an environment that allows fab0's host, and an API trigger whose URL and token you type into fab0's page, never into Claude Code. Routines don't load plugins, so the repository holds the worker skill itself: copy `skills/fab0-work/` from [fab0-dev/home](https://github.com/fab0-dev/home) to `.claude/skills/fab0-work/`, and add the allow rules of home's `routine-settings.json` to `.claude/settings.json`, so the routine can run the skill's commands.
+
 ## Update
 
 ```
