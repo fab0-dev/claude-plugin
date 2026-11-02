@@ -5,7 +5,7 @@ license: MIT
 compatibility: In the person's Claude Code, the fab0 MCP server (the fab0 plugin), git, and the GitHub CLI (gh) signed in as the person. In a routine, this skill in the repository's .claude/skills/, Node 22 or newer, git and gh.
 metadata:
   version: "2"
-  plugin: "0.9.0"
+  plugin: "0.9.1"
 ---
 
 # Work fab0 steps and acts
@@ -17,7 +17,7 @@ fab0 runs a pipeline over a team's GitHub issues and pull requests, and hands ea
 
 There are two ways in: the person's Claude Code, through the fab0 tools (1 to 3), and a routine's session started by a fab0 fire, through this skill's script (the routine's 1 to 3). Both go on with 4 to 7.
 
-This is `fab0-work` version `2`, shipped in plugin `0.9.0`.
+This is `fab0-work` version `2`, shipped in plugin `0.9.1`.
 
 ## Rules
 
@@ -130,8 +130,10 @@ When `step.makes` is `issues`:
 
 Call `complete_step` with the token and `outputs`:
 
-- the keys `output.required` names: `pr` is the key (`owner/repo#number`) of the pull request you opened or pushed to, `issues` the list of the new issues' keys, and `verdict` the review's `{ "verdict": "approve" | "changes" | "reject", "findings": "<markdown>" }`;
+- the keys `output.required` names: `pr` is the key (`owner/repo#number`) of the pull request you opened or pushed to, and `issues` the list of the new issues' keys;
 - any other keys, as `output.schema` defines them.
+
+When `output.required` names `verdict`, the outputs are the reviewer's verdict itself, with no other key: `{ "verdict": "approve" | "changes" | "reject", "findings": "<markdown>" }`. Never nest it under a `verdict` key.
 
 Before you call, check what fab0 will check, since a report that fails it fails the step's attempt and its token is dead:
 
