@@ -13,7 +13,7 @@ It installs:
 In Claude Code:
 
 ```
-/plugin marketplace add fab0-dev/claude-plugin
+/plugin marketplace add fabtend/claude-plugin
 /plugin install fab0@fab0
 ```
 
@@ -27,13 +27,13 @@ In a checkout of a repository that runs fab0 pipelines:
 
 - `/mcp__plugin_fab0_fab0__continue` shows what waits on you there, and continues with the entry you pick.
 - Or ask in your own words: "what's waiting on me in fab0?", "show run 01K…", "take the next fab0 step".
-- To write a pipeline, describe how work should flow: "write a fab0 pipeline where a planner breaks each Feature into Stories, and a person reviews each Story's pull request". Or start from a recipe in [fab0-dev/home](https://github.com/fab0-dev/home): "set up the feature-delivery recipe".
+- To write a pipeline, describe how work should flow: "write a fab0 pipeline where a planner breaks each Feature into Stories, and a person reviews each Story's pull request". Or start from a recipe in [fabtend/home](https://github.com/fabtend/home): "set up the feature-delivery recipe".
 
 Steps and acts are done with your own `git` and GitHub CLI (`gh`), signed in as you. fab0 itself never writes to GitHub. Claude Code's auto mode refuses an act's label change or merge as a write to an external system, so approve those `gh` commands when Claude Code asks, with auto mode off, or allow them for your repositories in `/permissions`.
 
 ## Register a routine
 
-fab0 can also hand your steps and acts to a Claude Code routine of yours, which runs them in the cloud. Ask "register a fab0 routine for this repository" and follow the setup it gives: one routine per repository and model class, with that repository alone, fab0's saved prompt, an environment that allows fab0's host, and an API trigger whose URL and token you type into fab0's page, never into Claude Code. Routines don't load plugins, so the repository holds the worker skill itself: copy `skills/fab0-work/` from [fab0-dev/home](https://github.com/fab0-dev/home) to `.claude/skills/fab0-work/`, and add the allow rules of home's `routine-settings.json` to `.claude/settings.json`, so the routine can run the skill's commands.
+fab0 can also hand your steps and acts to a Claude Code routine of yours, which runs them in the cloud. Ask "register a fab0 routine for this repository" and follow the setup it gives: one routine per repository and model class, with that repository alone, fab0's saved prompt, an environment that allows fab0's host, and an API trigger whose URL and token you type into fab0's page, never into Claude Code. Routines don't load plugins, so the repository holds the worker skill itself: copy `skills/fab0-work/` from [fabtend/home](https://github.com/fabtend/home) to `.claude/skills/fab0-work/`, and add the allow rules of home's `routine-settings.json` to `.claude/settings.json`, so the routine can run the skill's commands.
 
 ## Update
 

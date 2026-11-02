@@ -1,6 +1,6 @@
 ---
 name: fab0-pipelines
-description: Writes and changes fab0 pipelines in a repository's .fab0/pipelines.yml, one pipeline at a time, from a person's description, raw ideas, a recipe from fab0-dev/home or an existing pipeline. Validates each draft with the fab0 MCP tools until no error is left, commits it through a pull request, and syncs it after the merge. Use when the person asks to write, change, fix or explain a fab0 pipeline or .fab0/pipelines.yml, describes how work should flow through their GitHub issues and pull requests (planning, specs, implementation, review, approval, status labels), or names a fab0 recipe.
+description: Writes and changes fab0 pipelines in a repository's .fab0/pipelines.yml, one pipeline at a time, from a person's description, raw ideas, a recipe from fabtend/home or an existing pipeline. Validates each draft with the fab0 MCP tools until no error is left, commits it through a pull request, and syncs it after the merge. Use when the person asks to write, change, fix or explain a fab0 pipeline or .fab0/pipelines.yml, describes how work should flow through their GitHub issues and pull requests (planning, specs, implementation, review, approval, status labels), or names a fab0 recipe.
 license: MIT
 compatibility: Needs the fab0 MCP server (the fab0 plugin for Claude Code), git, and the GitHub CLI (gh) signed in as the person.
 metadata:
@@ -35,7 +35,7 @@ Work in a checkout of the repository. Its `owner/name` is in `git remote get-url
 Start from one of:
 
 - **the person's description or raw ideas;**
-- **a recipe**, a tested pipeline from `fab0-dev/home`. List their names with `gh api repos/fab0-dev/home/contents/recipes --jq '.[].name | select(endswith(".yml")) | rtrimstr(".yml")'`, and read one with `gh api repos/fab0-dev/home/contents/recipes/<name>.yml -H "Accept: application/vnd.github.raw+json"`. A recipe names the people, repositories and skills it was tested with: replace each with the person's own, and name only skills their repository holds or will hold. Change its types and status labels to the person's too, and as little else as you can;
+- **a recipe**, a tested pipeline from `fabtend/home`. List their names with `gh api repos/fabtend/home/contents/recipes --jq '.[].name | select(endswith(".yml")) | rtrimstr(".yml")'`, and read one with `gh api repos/fabtend/home/contents/recipes/<name>.yml -H "Accept: application/vnd.github.raw+json"`. A recipe names the people, repositories and skills it was tested with: replace each with the person's own, and name only skills their repository holds or will hold. Change its types and status labels to the person's too, and as little else as you can;
 - **a document of the file,** to change.
 
 Ask only what the catalogue can't default, and only what the start doesn't already answer:
