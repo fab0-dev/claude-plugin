@@ -1,6 +1,6 @@
 {
   "name": "fab0",
-  "description": "The fab0 plugin for Claude Code: your pipelines' runs, queue, steps and acts.",
+  "description": "The fab0 plugin for Claude Code: your pipelines' runs, queue, steps and signals.",
   "owner": { "name": "fab0" },
   "plugins": [{ "name": "fab0", "source": "./" }]
 }

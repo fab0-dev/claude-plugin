@@ -1,4 +1,4 @@
-// The session's token usage, for complete_step's `usage` in a routine (J.5, agent interface section 12.1). It runs
+// The session's token usage, for complete's `usage` in a routine (J.5, agent interface section 10). It runs
 // under Node 22 or newer, with no dependency.
 //
 //   node usage.mjs
