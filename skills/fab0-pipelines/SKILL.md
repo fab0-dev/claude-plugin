@@ -1,6 +1,6 @@
 ---
 name: fab0-pipelines
-description: Writes and changes fab0 pipelines, one at a time, from a person's description, a recipe from fabtend/home or a pipeline fab0 already holds. Validates each draft with the fab0 MCP tools until no error is left, puts it, reports each warning with what to do (a secret to set, with the command the person runs), and commits .fab0/pipelines.yml through a pull request when the person keeps it in a repository. Use when the person asks to write, change, fix or explain a fab0 pipeline or a pipelines file, describes how work should move between people, agents and their GitHub issues and pull requests (steps, reviews, approvals, loops, children), names a fab0 recipe, or asks why a pipeline is invalid or what a validation warning means.
+description: Writes and changes fab0 pipelines, one at a time, from a person's description, a recipe from fabtend/home or a pipeline fab0 already holds. Validates each draft with the fab0 MCP tools until no error is left, puts it, reports each warning with what to do (a secret to set, with the command the person runs before the put), and commits .fab0/pipelines.yml through a pull request when the person keeps it in a repository. Use when the person asks to write, change, fix or explain a fab0 pipeline or a pipelines file, describes how work should move between people, agents and their GitHub issues and pull requests (steps, reviews, approvals, loops, children), names a fab0 recipe, or asks why a pipeline is invalid or what a validation warning means.
 license: MIT
 compatibility: Needs the fab0 MCP server (the fab0 plugin for Claude Code). Committing the file needs git and the GitHub CLI (gh) signed in as the person; setting a secret needs curl in the person's own shell.
 metadata:
@@ -19,7 +19,7 @@ fab0 holds a team's pipelines and their runs. A pipeline is a state machine writ
 - Write only what reference.md describes. Never invent a key, a signal, a field or a value. If the person asks for something a pipeline can't say (an expression, a template, fab0 writing to GitHub), tell them, and offer the nearest thing it can.
 - One pipeline at a time: one YAML document. In a file of several, leave every other document exactly as it is, byte for byte: each document's text is its pipeline's version.
 - fab0 decides nothing. Every decision is a state that waits for a signal; ask the person who sends it, and name them in `by`.
-- A secret's value never passes through you. Never ask for it, read it, print it, or put it in a file, a tool call or a command you run. The person sets it from their own shell, with the command you give them (5).
+- A secret's value never passes through you. Never ask for it, read it, print it, or put it in a file, a tool call or a command you run. The person sets it from their own shell, with the command you give them (3).
 - Use the person's own `git` and `gh`. For every change on GitHub, use the REST API (`gh api`), never GraphQL. Never push to the default branch unless the person tells you to.
 
 ## 1. Understand
@@ -30,7 +30,7 @@ Start from one of:
 
 - **The person's description**, or their raw ideas.
 - **A recipe**, a tested pipeline from `fabtend/home`. List them with `gh api repos/fabtend/home/contents/recipes --jq '.[].name'`, and read one with `gh api repos/fabtend/home/contents/recipes/<name>.yml -H "Accept: application/vnd.github.raw+json"`. A recipe names the people, repositories and skills it was tested with (`your-login`, `reviewer-login`): replace each with the person's own, and name only skills their repository holds or will hold. Change as little else as you can.
-- **A pipeline fab0 holds**, to change. fab0 keeps its text where it came from: the repository's `.fab0/pipelines.yml`, or the file the person put. Read that text. Call `validate_pipeline` with `tenant` and `name` for the report fab0 stored for its active version: its `version`, and the errors and warnings it was put with. Then call `validate_pipeline` with the text: when its document's `version` equals the stored one, the text is what runs. If they differ, or the person has no text, tell them, and write the pipeline again from the description.
+- **A pipeline fab0 holds**, to change. fab0 keeps its text where it came from: the repository's `.fab0/pipelines.yml`, or the file the person put. Read that text. Call `validate_pipeline` with `tenant` and `name` for the report fab0 stored for its active version: its `version`, and the errors and warnings it was put with. Then call `validate_pipeline` with the text (as in 3): when its document's `version` equals the stored one, the text is what runs. If they differ, or the person has no text, tell them, and write the pipeline again from the description.
 
 A step that a routine or `fab0-work` runs names its skill in `with.skill`. List the skills the repository holds, the folders of `.claude/skills/` in the person's checkout, or in another repository with `gh api repos/<owner>/<repo>/contents/.claude/skills --jq '.[].name'`.
 
@@ -57,12 +57,21 @@ Write one document, from the start you chose and reference.md:
 
 ## 3. Validate until clean
 
-1. Call `validate_pipeline` with `text`: the whole file, not only your document, so names are checked across documents.
+1. Call `validate_pipeline` with `tenant` and `text` when the person is an admin of the tenant, otherwise with `text` alone. `text` is the whole file, not only your document, so names are checked across documents. With `tenant`, fab0 adds the store's warnings (`secret-unset`, `unknown-pipeline`) to each valid document, as `put_pipeline` would, and stores nothing; a member is refused `forbidden`, so use `text` alone for them.
 2. If the answer has `problems`, a YAML error or a file cap, it has no documents: fix those first.
 3. For each error of your document, go to its `path` (and its `line`), and apply its `fix`. `adapter-signal` and `adapter-field` list the signals or fields to choose from. When a fix leaves a choice, take it from the code's row in reference.md section 9, or ask the person.
-4. Call `validate_pipeline` with `text` again. Repeat until your document has no error.
+4. Call `validate_pipeline` again, the same way. Repeat until your document has no error.
 
 If an error is still there after you applied its fix twice, stop, and show it to the person with what you tried. Show the person any errors in documents you didn't change, and leave them: they are another change.
+
+**Before the put**, give the person the secrets command for each `secret-unset` warning, so the secret is set when the pipeline goes live, not after. Give them this command to run in their own shell:
+
+```bash
+pbpaste | curl -fsS -X PUT "https://<host>/api/v1/secrets/<NAME>?tenant=<tenant id>&origin=<origin>" \
+  -H "Authorization: Bearer $(gh auth token)" --data-binary @-
+```
+
+Fill in `<NAME>`, `<origin>`, `<tenant id>` and `<host>`: `<NAME>` is the executor's `secret`; `<origin>` is its `url`'s scheme and host, with the port only when it isn't 443 (`https://api.anthropic.com` for a routine); `<tenant id>` is the tenant's `id` from `whoami`; `<host>` is the fab0 server's, `mcp.fab0.dev`, or the host of `FAB0_MCP_URL` when the person set one. Leave the value to the person's shell: the command reads it from their clipboard with `pbpaste` (on macOS), or they pipe in the output of another command that prints it, such as their password manager's. Never ask for the value, read it, or run the command yourself. If the person pastes a value into the conversation, don't repeat or use it, and tell them to make a new one, since this one was exposed. The person must be an admin of the tenant; GitHub's `/user` reads who they are from their token, which fab0 doesn't keep. The message says when the secret is set for another origin: the same command sets it for this one.
 
 ## 4. Put
 
@@ -78,16 +87,7 @@ Report each warning by its `path`, not by its `line`: a store warning's line is 
 
 - `unbounded-wait`: a state may wait for ever. Ask whether a person always answers, or every child always ends; if not, add a `timeout`, handle it, and validate and put again.
 - `unknown-pipeline`: the child pipeline isn't in the tenant yet. Write and put it too; until then, the step's `start_child` is refused.
-- `secret-unset`: the executor at the path (`executors.<name>.secret`) has no secret set for its origin, so its steps fail with cause `refused` until the person sets it. Give the person this command to run in their own shell:
-
-```bash
-pbpaste | curl -fsS -X PUT "https://<host>/api/v1/secrets/<NAME>?tenant=<tenant id>&origin=<origin>" \
-  -H "Authorization: Bearer $(gh auth token)" --data-binary @-
-```
-
-Fill in `<NAME>`, `<origin>`, `<tenant id>` and `<host>`: `<NAME>` is the executor's `secret`; `<origin>` is its `url`'s scheme and host, with the port only when it isn't 443 (`https://api.anthropic.com` for a routine); `<tenant id>` is the tenant's `id` from `whoami`; `<host>` is the fab0 server's, `mcp.fab0.dev`, or the host of `FAB0_MCP_URL` when the person set one. Leave the value to the person's shell: the command reads it from their clipboard with `pbpaste` (on macOS), or they pipe in the output of another command that prints it, such as their password manager's. Never ask for the value, read it, or run the command yourself. If the person pastes a value into the conversation, don't repeat or use it, and tell them to make a new one, since this one was exposed. The person must be an admin of the tenant; GitHub's `/user` reads who they are from their token, which fab0 doesn't keep. The message says when the secret is set for another origin: the same command sets it for this one.
-
-Runs already started keep the version they began with; new runs use the one just put.
+- `secret-unset`: the executor at the path (`executors.<name>.secret`) has no secret set for its origin, so its steps fail with cause `refused` until the person sets it. Runs already started keep the version they began with; new runs use the one just put.
 
 ## 6. Commit
 
