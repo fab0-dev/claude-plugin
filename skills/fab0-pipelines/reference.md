@@ -252,7 +252,7 @@ start:
 
 ## 9. Validation codes
 
-`validate_pipeline` with `text` answers the file's `problems` (a YAML error or a file cap, which stop every document) and, for each document, its `errors`, which make that pipeline invalid, and its `warnings`, which don't. Each problem has a `code`, its document and pipeline `name`, a `path` to the offending key, a `line`, a `message` and a `fix`. Apply the fix at the path. `put_pipeline` and the file sync add the `store` warnings, which check a document against what the tenant holds; their `line` is the document's first line, so read their `path`.
+`validate_pipeline` with `text` answers the file's `problems` (a YAML error or a file cap, which stop every document) and, for each document, its `errors`, which make that pipeline invalid, and its `warnings`, which don't. Each problem has a `code`, its document and pipeline `name`, a `path` to the offending key, a `line`, a `message` and a `fix`. Apply the fix at the path. `put_pipeline`, the file sync and `validate_pipeline` with `tenant` and `text` (an admin only; it stores nothing) add the `store` warnings, which check a document against what the tenant holds; their `line` is the document's first line, so read their `path`.
 
 | Code | Kind | What it means | Fix |
 | --- | --- | --- | --- |
@@ -276,7 +276,7 @@ start:
 | `outputs-schema` | error | `outputs` isn't a valid JSON Schema, or can't be built: two subschemas with the same `$id`, or a `$ref` that doesn't resolve inside it (no schema is fetched) | correct it; `type: object` with `properties` is enough |
 | `limit-cap` | error | a limit or duration outside its range | use a value within section 4's or 8's range |
 | `unknown-pipeline` | warning (store) | `children.pipeline` names no pipeline in the file or the tenant | put that pipeline too; until then the step's `start_child` is refused |
-| `secret-unset` | warning (store) | an `http` or `claude-routine` executor's `secret` has no value in the tenant, or is set for another origin than the executor's `url`, which the message names. Its path is `executors.<name>.secret` | the person sets it with the secrets endpoint, from their own shell (section 3) |
+| `secret-unset` | warning (store) | an `http` or `claude-routine` executor's `secret` has no value in the tenant, or is set for another origin than the executor's `url`, which the message names. Its path is `executors.<name>.secret` | the person sets it with the secrets endpoint, from their own shell (section 3), before the put |
 | `unbounded-wait` | warning | a state with `children` and no `timeout`; or a state without `run` and without `timeout` whose every transition has `by` | none, if a person always answers or every child always ends; otherwise add a `timeout` and handle it |
 
 ## 10. Whole pipelines
